@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="UONPayApp.Views.LoginPage"
+             Title="Login">
+    <ScrollView>
+        <VerticalStackLayout Padding="24" Spacing="16" VerticalOptions="Center">
+            <Frame Style="{StaticResource CardFrameStyle}" BackgroundColor="{StaticResource Primary}" Padding="20">
+                <VerticalStackLayout Spacing="6">
+                    <Label Text="UON Pay App" FontSize="28" FontAttributes="Bold" TextColor="White" />
+                    <Label Text="Sign in with an approved account stored in the local backend data file." TextColor="#DDECF7" />
+                </VerticalStackLayout>
+            </Frame>
+
+            <Frame Style="{StaticResource CardFrameStyle}">
+                <VerticalStackLayout Spacing="12">
+                    <Label Text="Student Login" Style="{StaticResource SectionTitleStyle}" />
+                    <Entry x:Name="StudentIdOrEmailEntry" Placeholder="Student ID or email" />
+                    <Entry x:Name="PasswordEntry" Placeholder="Password" IsPassword="True" />
+                    <Button Text="Log In" Style="{StaticResource PrimaryButtonStyle}" Clicked="OnLoginClicked" />
+                    <Label Text="Sample login: S1234567 / Pass@123" FontSize="12" TextColor="{StaticResource TextMuted}" />
+                </VerticalStackLayout>
+            </Frame>
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

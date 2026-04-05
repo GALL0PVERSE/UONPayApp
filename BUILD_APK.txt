@@ -1,0 +1,17 @@
+Build APK on Windows with Visual Studio Developer PowerShell or terminal:
+
+1. Install Visual Studio 2022 with .NET MAUI workload and Android SDK.
+2. Open this project folder.
+3. Run:
+   dotnet restore
+   dotnet publish UONPayApp.csproj -f net10.0-android -c Release
+
+Expected APK output path:
+   bin\Release\net10.0-android\publish\com.example.uonpayapp-Signed.apk
+
+If you prefer Visual Studio:
+- Set target to Android
+- Configuration: Release
+- Archive/Publish the Android project
+
+Note: signing details may vary by local SDK / MAUI setup.

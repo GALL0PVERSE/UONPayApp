@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="UONPayApp.Views.ProfilePage"
+             Title="My Profile">
+    <ScrollView>
+        <VerticalStackLayout Padding="16">
+            <Frame Style="{StaticResource CardFrameStyle}" BackgroundColor="{StaticResource Primary}" Padding="16">
+                <Label Text="My Profile" FontSize="24" TextColor="White" FontAttributes="Bold" />
+            </Frame>
+
+            <Frame Style="{StaticResource CardFrameStyle}">
+                <Grid ColumnDefinitions="80,*" ColumnSpacing="12">
+                    <Frame WidthRequest="70" HeightRequest="70" CornerRadius="35" Padding="0" BackgroundColor="#E5E7EB" HasShadow="False" VerticalOptions="Center">
+                        <Label Text="👤" FontSize="34" HorizontalOptions="Center" VerticalOptions="Center" />
+                    </Frame>
+                    <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="4">
+                        <Label x:Name="FullNameLabel" Text="Student Name" FontSize="20" FontAttributes="Bold" />
+                        <Label x:Name="StudentIdLabel" Text="Student ID:" TextColor="{StaticResource TextMuted}" />
+                        <Label x:Name="EmailLabel" Text="Email:" TextColor="{StaticResource TextMuted}" />
+                    </VerticalStackLayout>
+                </Grid>
+            </Frame>
+
+            <Button Text="Log Out" Style="{StaticResource PrimaryButtonStyle}" Clicked="OnLogoutClicked" />
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

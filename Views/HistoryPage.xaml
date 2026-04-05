@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="UONPayApp.Views.HistoryPage"
+             Title="Transaction History">
+    <ScrollView>
+        <VerticalStackLayout Padding="16">
+            <Frame Style="{StaticResource CardFrameStyle}" BackgroundColor="{StaticResource Primary}" Padding="16">
+                <Label Text="Payment History" FontSize="24" TextColor="White" FontAttributes="Bold" />
+            </Frame>
+
+            <Frame Style="{StaticResource CardFrameStyle}">
+                <VerticalStackLayout Spacing="8">
+                    <Label Text="Saved Transactions" Style="{StaticResource SectionTitleStyle}" />
+                    <CollectionView x:Name="TransactionsView" SelectionMode="None">
+                        <CollectionView.EmptyView>
+                            <Label Text="No payment history yet." TextColor="{StaticResource TextMuted}" />
+                        </CollectionView.EmptyView>
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate>
+                                <Frame Margin="0,0,0,10" Padding="12" BorderColor="#E5E7EB">
+                                    <VerticalStackLayout Spacing="4">
+                                        <Grid ColumnDefinitions="*,Auto">
+                                            <Label Text="{Binding Title}" FontAttributes="Bold" />
+                                            <Label Grid.Column="1" Text="{Binding Amount, StringFormat='${0:F2}'}" FontAttributes="Bold" />
+                                        </Grid>
+                                        <Label Text="{Binding DateText}" FontSize="12" TextColor="{StaticResource TextMuted}" />
+                                        <Label Text="{Binding PaymentMethod, StringFormat='Method: {0}'}" FontSize="12" TextColor="{StaticResource TextMuted}" />
+                                        <Label Text="{Binding Reference, StringFormat='Reference: {0}'}" FontSize="12" TextColor="{StaticResource TextMuted}" />
+                                        <Label Text="{Binding Status}" TextColor="{StaticResource Success}" FontSize="12" />
+                                    </VerticalStackLayout>
+                                </Frame>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </VerticalStackLayout>
+            </Frame>
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

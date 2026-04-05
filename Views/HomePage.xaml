@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="UONPayApp.Views.HomePage"
+             Title="Home">
+    <ScrollView>
+        <VerticalStackLayout Padding="16" Spacing="0">
+            <Frame Style="{StaticResource CardFrameStyle}" BackgroundColor="{StaticResource Primary}" Padding="16">
+                <VerticalStackLayout Spacing="4">
+                    <Label x:Name="WelcomeNameLabel" Text="Welcome" FontSize="22" TextColor="White" FontAttributes="Bold" />
+                    <Label x:Name="StudentIdLabel" Text="Student ID:" FontSize="14" TextColor="#DDECF7" />
+                    <Label x:Name="EmailLabel" Text="Email:" FontSize="14" TextColor="#DDECF7" />
+                </VerticalStackLayout>
+            </Frame>
+
+            <Frame Style="{StaticResource CardFrameStyle}">
+                <VerticalStackLayout Spacing="8">
+                    <Label Text="Outstanding Balance" Style="{StaticResource SectionTitleStyle}" />
+                    <Label x:Name="OutstandingBalanceLabel" Text="$0.00" FontSize="38" HorizontalOptions="Center" FontAttributes="Bold" />
+                    <Label Text="Use the Payments page to submit a new payment." HorizontalOptions="Center" TextColor="{StaticResource TextMuted}" />
+                </VerticalStackLayout>
+            </Frame>
+
+            <Frame Style="{StaticResource CardFrameStyle}">
+                <VerticalStackLayout Spacing="8">
+                    <Label Text="Recent Transactions" Style="{StaticResource SectionTitleStyle}" />
+                    <CollectionView x:Name="RecentTransactionsView" SelectionMode="None">
+                        <CollectionView.EmptyView>
+                            <Label Text="No transactions yet." TextColor="{StaticResource TextMuted}" />
+                        </CollectionView.EmptyView>
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate>
+                                <Grid ColumnDefinitions="*,Auto" Padding="0,8">
+                                    <VerticalStackLayout>
+                                        <Label Text="{Binding Title}" FontAttributes="Bold" />
+                                        <Label Text="{Binding DateText}" FontSize="12" TextColor="{StaticResource TextMuted}" />
+                                    </VerticalStackLayout>
+                                    <VerticalStackLayout Grid.Column="1" HorizontalOptions="End" Spacing="0">
+                                        <Label Text="{Binding Amount, StringFormat='${0:F2}'}" HorizontalTextAlignment="End" />
+                                        <Label Text="{Binding Status}" TextColor="{StaticResource Success}" FontSize="12" HorizontalTextAlignment="End" />
+                                    </VerticalStackLayout>
+                                </Grid>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </VerticalStackLayout>
+            </Frame>
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>
