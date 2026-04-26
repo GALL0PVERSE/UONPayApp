@@ -3,21 +3,50 @@ using UONPayApp.Models;
 
 namespace UONPayApp.Services;
 
+/// <summary>
+/// AppDataService is the small local "backend" for this demo app.
+/// It stores login accounts, the current logged-in user, each student's balance ledger,
+/// payment history, and saved cards in one JSON file on the device.
+///
+/// Android/Windows local storage path:
+/// FileSystem.Current.AppDataDirectory/uonpayapp-data.json
+///
+/// Important design:
+/// - LoginAccounts contains the approved student accounts and their saved cards.
+/// - AccountLedgers is a Dictionary keyed by StudentId.
+/// - Because the ledger key is the StudentId, every student has separate balance and bills.
+/// </summary>
 public class AppDataService
 {
+    // Full local file path where the JSON database is saved on the device.
     private readonly string _filePath;
+
+    // Pretty JSON makes the saved data easier to inspect while testing.
     private readonly JsonSerializerOptions _jsonOptions = new() { WriteIndented = true };
 
+    // Store is the whole app database currently loaded in memory.
     public AppDataStore Store { get; private set; } = new();
 
     public AppDataService()
     {
+        // AppDataDirectory is managed by .NET MAUI and points to app-private storage.
+        // On Android, this is inside the app sandbox, so other apps cannot normally read it.
         _filePath = Path.Combine(FileSystem.Current.AppDataDirectory, "uonpayapp-data.json");
+
+        // Load existing saved data first. If no file exists, Load() creates an empty store.
         Load();
+
+        // Add default test accounts/ledgers/cards only when the store is empty.
         SeedDefaults();
+
+        // Save immediately so the JSON file exists after first launch.
         Save();
     }
 
+    /// <summary>
+    /// Reads the JSON database from local storage into memory.
+    /// If the file does not exist or is damaged, the app safely starts with a new empty store.
+    /// </summary>
     public void Load()
     {
         if (!File.Exists(_filePath))
@@ -33,16 +62,26 @@ public class AppDataService
         }
         catch
         {
+            // If JSON cannot be read, avoid crashing the app.
+            // In a real production app, you would log this error.
             Store = new AppDataStore();
         }
     }
 
+    /// <summary>
+    /// Writes the current in-memory database back to the local JSON file.
+    /// Call this after login/logout or after adding a payment transaction.
+    /// </summary>
     public void Save()
     {
         var json = JsonSerializer.Serialize(Store, _jsonOptions);
         File.WriteAllText(_filePath, json);
     }
 
+    /// <summary>
+    /// Checks the entered student ID/email and password against the approved local accounts.
+    /// Only accounts listed in Store.LoginAccounts can log in.
+    /// </summary>
     public bool TryLogin(string studentIdOrEmail, string password)
     {
         var loginValue = studentIdOrEmail.Trim();
@@ -58,13 +97,19 @@ public class AppDataService
             return false;
         }
 
+        // Make sure this student has their own separate ledger before entering the app.
         EnsureLedgerExists(matchedAccount.StudentId);
+
+        // Save only the profile information as CurrentUser, not the password.
         Store.IsLoggedIn = true;
         Store.CurrentUser = UserProfile.FromLoginAccount(matchedAccount);
         Save();
         return true;
     }
 
+    /// <summary>
+    /// Clears the current login state. The local accounts, cards, balances, and histories remain saved.
+    /// </summary>
     public void Logout()
     {
         Store.IsLoggedIn = false;
@@ -72,6 +117,10 @@ public class AppDataService
         Save();
     }
 
+    /// <summary>
+    /// Calculates the current student's outstanding balance.
+    /// Each student has a separate TotalDue and separate Transactions list.
+    /// </summary>
     public decimal GetOutstandingBalance()
     {
         var ledger = GetCurrentLedger();
@@ -80,6 +129,9 @@ public class AppDataService
         return balance < 0 ? 0 : balance;
     }
 
+    /// <summary>
+    /// Returns only the logged-in student's payment history, newest first.
+    /// </summary>
     public List<TransactionItem> GetCurrentTransactions()
     {
         return GetCurrentLedger()
@@ -88,6 +140,10 @@ public class AppDataService
             .ToList();
     }
 
+    /// <summary>
+    /// Returns only the logged-in student's saved payment cards.
+    /// Cards are stored under LoginAccount, so each student can have different cards.
+    /// </summary>
     public List<PaymentCard> GetCurrentPaymentCards()
     {
         var studentId = Store.CurrentUser?.StudentId;
@@ -100,6 +156,10 @@ public class AppDataService
         return account?.PaymentCards ?? [];
     }
 
+    /// <summary>
+    /// Adds a payment transaction to the logged-in student's own ledger only.
+    /// This is the key function that keeps bills/history separate between accounts.
+    /// </summary>
     public void AddTransaction(string title, decimal amount, string paymentMethod, string reference)
     {
         var ledger = GetCurrentLedger();
@@ -117,6 +177,10 @@ public class AppDataService
         Save();
     }
 
+    /// <summary>
+    /// Finds the ledger for the currently logged-in student.
+    /// The dictionary key is the StudentId, for example AccountLedgers["S1234567"].
+    /// </summary>
     private AccountLedger GetCurrentLedger()
     {
         var studentId = Store.CurrentUser?.StudentId;
@@ -129,6 +193,10 @@ public class AppDataService
         return Store.AccountLedgers[studentId];
     }
 
+    /// <summary>
+    /// Creates an empty ledger if a student does not have one yet.
+    /// This prevents errors when adding new accounts later.
+    /// </summary>
     private void EnsureLedgerExists(string studentId)
     {
         if (Store.AccountLedgers.ContainsKey(studentId))
@@ -139,6 +207,10 @@ public class AppDataService
         Store.AccountLedgers[studentId] = new AccountLedger();
     }
 
+    /// <summary>
+    /// Seeds test data for three student accounts.
+    /// This only runs when the lists are empty, so it does not overwrite saved user payments.
+    /// </summary>
     private void SeedDefaults()
     {
         if (Store.LoginAccounts.Count == 0)
@@ -186,6 +258,7 @@ public class AppDataService
 
         if (Store.AccountLedgers.Count == 0)
         {
+            // Each dictionary entry is one student's separate balance and history.
             Store.AccountLedgers = new Dictionary<string, AccountLedger>
             {
                 ["S1234567"] = new AccountLedger
@@ -220,11 +293,13 @@ public class AppDataService
             };
         }
 
+        // Defensive check: every login account must have a ledger.
         foreach (var account in Store.LoginAccounts)
         {
             EnsureLedgerExists(account.StudentId);
         }
 
+        // Defensive check: if old saved data had no cards, add default cards by account.
         foreach (var account in Store.LoginAccounts)
         {
             if (account.PaymentCards.Count == 0)
@@ -251,6 +326,8 @@ public class AppDataService
             }
         }
 
+        // Old versions used Store.Transactions as one shared history.
+        // It is cleared so all history now comes from AccountLedgers[studentId].Transactions.
         Store.Transactions = [];
     }
 
