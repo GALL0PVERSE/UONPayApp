@@ -9,6 +9,8 @@ public partial class LoginPage : ContentPage
     public LoginPage()
     {
         InitializeComponent();
+
+        // AppDataService works like the local backend for login validation.
         _dataService = App.Services.GetRequiredService<AppDataService>();
     }
 
@@ -23,6 +25,8 @@ public partial class LoginPage : ContentPage
             return;
         }
 
+        // TryLogin checks only the approved accounts seeded/saved in local JSON storage.
+        // On success, it also sets Store.CurrentUser, which controls whose balance/cards/history appear.
         if (!_dataService.TryLogin(studentIdOrEmail, password))
         {
             await DisplayAlert("Login failed", "Only approved accounts saved in the backend data can log in. Check the student ID/email and password.", "OK");
