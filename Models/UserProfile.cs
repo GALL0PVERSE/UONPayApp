@@ -1,5 +1,9 @@
 namespace UONPayApp.Models;
 
+/// <summary>
+/// Safe profile object for the currently logged-in user.
+/// It intentionally does not include the password.
+/// </summary>
 public class UserProfile
 {
     public string FullName { get; set; } = string.Empty;

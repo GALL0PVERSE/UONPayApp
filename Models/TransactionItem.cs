@@ -1,5 +1,8 @@
 namespace UONPayApp.Models;
 
+/// <summary>
+/// One payment record shown in the bill/payment history page.
+/// </summary>
 public class TransactionItem
 {
     public string DateText { get; set; } = string.Empty;
